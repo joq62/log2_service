@@ -16,7 +16,7 @@
 
 -export([create_table/0,create_table/2,add_node/2]).
 -export([create/1,delete/1]).
--export([read_all/0,read_level/1,read_level/2,read_all_levels/0,read_all_latest/1,read_node/1]).
+-export([read_all/0,read_level/1,read_level/2,read_node/1]).
 -export([do/1]).
 -export([member/1]).
 -export([]).
@@ -68,39 +68,21 @@ add_node(Node,StorageType)->
 %{Level,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}}
 
 create({Level,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp})->
-%    io:format(" create ~p~n",[{Level,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp,?MODULE,?LINE}]),
-    
- F = fun() -> 
-	     Info=#{
-		    timestamp=>TimeStamp,
-		    datetime=>calendar:now_to_datetime(TimeStamp),
-		    state=>new, % new, read
-		    level=>Level,
-		    msg=>Msg,
-		    node=>SenderNode,
-		    pid=>SenderPid,
-		    module=>Module,
-		    function=>FunctionName,
-		    line=>Line,
-		    data=>Data
+    Record=#?RECORD{
+		    timestamp=TimeStamp,
+		    datetime=calendar:now_to_datetime(TimeStamp),
+		    state=new, % new, read
+		    level=Level,
+		    msg=Msg,
+		    node=SenderNode,
+		    pid=SenderPid,
+		    module=Module,
+		    function=FunctionName,
+		    line=Line,
+		    data=Data
 		   },
-	     Z=do(qlc:q([X || X <- mnesia:table(?TABLE)])),
-	     Updated=case Z of
-			 []->
-			     #?RECORD{id=first,num=1,info=[Info|[]]};
-			 [S]->
-			     S#?RECORD{num=S#?RECORD.num+1,info=[Info|S#?RECORD.info]}
-		     end,
-	     mnesia:write(Updated)
-     end,
-    Result=case mnesia:transaction(F) of
-	       {atomic, Val} ->
-		   Val;
-	       {error,Reason}->
-		   {error,Reason}
-	   end,
-    Result.
-
+    F = fun() -> mnesia:write(Record) end,
+    mnesia:transaction(F).
 
 
 %%--------------------------------------------------------------------
@@ -123,7 +105,7 @@ delete(TimeStamp) ->
 
 member(TimeStamp)->
     Z=do(qlc:q([X || X <- mnesia:table(?TABLE),		
-		     X#?RECORD.info==TimeStamp])),
+		     X#?RECORD.timestamp==TimeStamp])),
     Member=case Z of
 	       []->
 		   false;
@@ -142,48 +124,20 @@ read_all() ->
     Z=do(qlc:q([X || X <- mnesia:table(?TABLE)])),
     get_result(Z).
 
-read_all_latest(Num)->
-    case read_all_levels() of
-	[]->
-	    [];
-	List->
-	    lists:sublist(List,Num)
-    end.
-read_all_levels()->
-    case lib_db_log2:read_all() of
-	[]->
-	    [];
-	[{_Id,_Num,MapList}]->
-	    MapList
-    end.
-
 read_level(Level,Num)->
     lists:sublist(read_level(Level),Num).
 
 read_level(Level)->
-    Z=do(qlc:q([X || X <- mnesia:table(?TABLE)])),		
-    case Z of
-	[]->
-	    {error,["No table initiated"]};
-	[S]->
-	    InfoList=S#?RECORD.info,
-	    [Map||Map<-InfoList,
-		  Level==maps:get(level,Map)]
-    end.
+    Z=do(qlc:q([X || X <- mnesia:table(?TABLE),		
+		     X#?RECORD.level==Level])),
+    get_result(Z).    
 
 read_node(Node)->
-    Z=do(qlc:q([X || X <- mnesia:table(?TABLE)])),		
-    case Z of
-	[]->
-	    {error,["No table initiated"]};
-	[S]->
-	    InfoList=S#?RECORD.info,
-	    [Map||Map<-InfoList,
-		  Node==maps:get(node,Map)]
-    end.  
-    
+    Z=do(qlc:q([X || X <- mnesia:table(?TABLE),		
+		     X#?RECORD.node==Node])),
+    get_result(Z).
 
-%%------------MapList--------------------------------------------------------
+%%--------------------------------------------------------------------
 %% @doc
 %%  
 %% @end
@@ -209,9 +163,17 @@ get_result(Z)->
 		  [];
 	       _->
 		   [{
-		     R#?RECORD.id,
-		     R#?RECORD.num,
-		     R#?RECORD.info
+		     R#?RECORD.timestamp,
+		     R#?RECORD.datetime,
+		     R#?RECORD.state,
+		     R#?RECORD.level,
+		     R#?RECORD.msg,
+		     R#?RECORD.node,
+		     R#?RECORD.pid,
+		     R#?RECORD.module,
+		     R#?RECORD.function,
+		     R#?RECORD.line,
+		     R#?RECORD.data
 		    }||R<-Z]
 	   end,
     Result.

@@ -2,15 +2,21 @@
 -define(RECORD,?TABLE).
 
 -record(?RECORD,{
-		 timestamp,
-		 datetime,
-		 state,
-		 level,
-		 msg,
-		 node,
-		 pid,
-		 module,
-		 function,
-		 line,
-		 data
+		 id,
+		 num,
+		 info
+		 
 		}).
+-record(info,{
+	       timestamp,
+	      datetime,
+	      state,
+	      level,
+	      msg,
+	      node,
+	      pid,
+	      module,
+	      function,
+	      line,
+	      data
+	     }).

@@ -45,24 +45,18 @@
 %		    data::term(),
 %		   },
  
-print_ln(_Map)->
-
-    ok.
-
-print(Map)->
-    TimeStamp=maps:get(timestamp,Map),
-    {Date,Time}=maps:get(datetime,Map),
-    State=maps:get(state,Map),
-    Level=maps:get(level,Map),
-    Msg=maps:get(msg,Map),
-    SenderNode=maps:get(node,Map),
-    SenderPid=maps:get(pid,Map),
-    Module=maps:get(module,Map),
-    FunctionName=maps:get(function,Map),
-    Line=maps:get(line,Map),
-    Data=maps:get(data,Map),
+print_ln(Info)->
+    {TimeStamp,{Date,Time},State,Level,Msg,SenderNode,SenderPid,Module,FunctionName,Line,Data}=Info,
     R=io_lib:format("~p",[Data]),
     DataAsString=lists:flatten(R),
+    io:format(" ~w ~w,~w,~w,~w,~s,~w,~w,~w,~w,~w,~s ~n",[TimeStamp,Date,Time,State,Level,Msg,SenderNode,SenderPid,Module,FunctionName,Line,DataAsString]),
+    ok.
+
+print(Info)->
+    {TimeStamp,{Date,Time},State,Level,Msg,SenderNode,SenderPid,Module,FunctionName,Line,Data}=Info,
+    R=io_lib:format("~p",[Data]),
+    DataAsString=lists:flatten(R),
+    
     io:format("~w ~w ~w ~w ~w ~w ~w ~w ~s ~s ~s ~s ~n",[Date,Time,Level,SenderNode,SenderPid,Module,FunctionName,Line,":",Msg,">>",DataAsString]),
     ok.
 %%--------------------------------------------------------------------

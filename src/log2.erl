@@ -177,7 +177,7 @@ handle_call(Request, From, State) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_cast({Level,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}}, State) ->
-    {atomic,ok}=lib_db_log2:create({Level,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}),
+    ok=lib_db_log2:create({Level,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}),
     {noreply,State};
 
 handle_cast(_Msg, State) ->
@@ -211,7 +211,6 @@ handle_info(timeout, State) ->
 	Log2Nodes->
 	    ok=lib_dbase:dynamic_db_init(Log2Nodes)
     end,
-
     ?LOG_NOTICE("Server started",[?MODULE]),
     {noreply, State};
 

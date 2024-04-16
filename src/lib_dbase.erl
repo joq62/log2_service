@@ -70,8 +70,7 @@ dynamic_db_init([])->
     mnesia:delete_schema([node()]),
     mnesia:create_schema([node()]),
     mnesia:start(),  
-    ok=lib_db_log2:create_table(),
-    
+    ok=lib_db_log2:create_table(),    
     ok;
 
 dynamic_db_init([DbaseNode|T])->
