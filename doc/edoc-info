@@ -1,0 +1,3 @@
+%% encoding: UTF-8
+{application,log2_service}.
+{modules,[lib_db_log2,lib_dbase,lib_log2,log2]}.
