@@ -23,10 +23,16 @@
 	]).
 
 -export([
-	 read_all/0,
+	 format/1, 
+	 read_all_latest/1,
+	 read_all_levels/0,
 	 read_level/1,
 	 read_level/2,
-	 read_node/1
+	 read_node/1,
+
+	 read_all/0
+
+
 	]).
 
 
@@ -67,9 +73,36 @@ start_link() ->
 %%%===================================================================
 %%--------------------------------------------------------------------
 %% @doc
-%% 
+%% creates format Info and Data for io:format(Info,Data)
 %% @end
 %%--------------------------------------------------------------------
+-spec format(LevelInfoMap :: map())-> {Info :: string(),Data :: term()} | {error,Reason :: term()}.
+format(LevelInfoMap)->
+    gen_server:call(?SERVER, {format,LevelInfoMap},infinity).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Returns list og Maps that contains all info
+%% @end
+%%--------------------------------------------------------------------
+-spec read_all_latest(Num ::integer())-> ListOfLevelInfo :: term().
+read_all_latest(Num)->
+    gen_server:call(?SERVER, {read_all_latest,Num},infinity).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Returns list og Maps that contains all info
+%% @end
+%%--------------------------------------------------------------------
+-spec read_all_levels()-> ListAllInfo :: term().
+read_all_levels()->
+    gen_server:call(?SERVER, {read_all_levels},infinity).
+%%--------------------------------------------------------------------
+%% @doc
+%% Returns [{Id,Num,InfoList}]
+%% @end
+%%--------------------------------------------------------------------
+-spec read_all()-> CompleteTable :: term().
 read_all()->
     gen_server:call(?SERVER, {read_all},infinity).
 

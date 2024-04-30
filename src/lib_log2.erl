@@ -12,6 +12,7 @@
 -module(lib_log2).     
  
 -export([
+	 format/1,
 	 print_ln/1,
 	 print/1,
 	 create_logger/5,
@@ -22,6 +23,35 @@
 %% --------------------------------------------------------------------
 %% Include files
 %% --------------------------------------------------------------------
+
+
+%%--------------------------------------------------------------------
+%% @doc
+%% 
+%% @end
+%%--------------------------------------------------------------------
+format(Map)->
+    TimeStamp=maps:get(timestamp,Map),
+    {Date,Time}=maps:get(datetime,Map),
+    {Year,Mon,Day}=Date,
+    {Hour,Min,Sec}=Time,
+    DateStr=integer_to_list(Year)++":"++integer_to_list(Mon)++":"++integer_to_list(Day),
+    TimeStr=integer_to_list(Hour)++":"++integer_to_list(Min)++":"++integer_to_list(Sec),
+    
+    State=maps:get(state,Map),
+    Level=maps:get(level,Map),
+    Msg=maps:get(msg,Map),
+    SenderNode=maps:get(node,Map),
+    SenderPid=maps:get(pid,Map),
+    Module=maps:get(module,Map),
+    FunctionName=maps:get(function,Map),
+    Line=maps:get(line,Map),
+    Data=maps:get(data,Map),
+    R=io_lib:format("~p",[Data]),
+    DataAsString=lists:flatten(R),
+    Info="~s ~s | ~w | ~w | ~w | {~w,~w,~w} ~s ~s ~s ~s",
+    FormatData=[DateStr,TimeStr,Level,SenderNode,SenderPid,Module,FunctionName,Line,":",Msg,">>",DataAsString],
+    {Info,FormatData}.
 
 
 %%--------------------------------------------------------------------

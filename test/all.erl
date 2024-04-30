@@ -143,7 +143,9 @@ print_loop(LatestMap)->
        [Map]->
 	   if 
 	       Map/=LatestMap->
-		   lib_log2:print(Map),
+		   {Info,Data}=lib_log2:format(Map),
+		   io:format(Info,Data),
+		   io:format("~n"),
 		   NewLatest=Map;
 	       true ->
 		   NewLatest=LatestMap
