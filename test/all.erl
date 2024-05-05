@@ -137,6 +137,7 @@ setup()->
     ok.
 
 print_loop(LatestMap)->
+  
    case lib_db_log2:read_all_latest(1) of
        []->
 	   NewLatest=LatestMap;

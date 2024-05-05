@@ -158,8 +158,16 @@ init([]) ->
 %% Handling call messages
 %% @end
 %%--------------------------------------------------------------------
+handle_call({format,LevelInfo},_From, State) ->
+    Reply = lib_log2:format(LevelInfo),
+    {reply, Reply, State};
+
 handle_call({read_all},_From, State) ->
     Reply = lib_db_log2:read_all(),
+    {reply, Reply, State};
+
+handle_call({read_all_levels},_From, State) ->
+    Reply = lib_db_log2:read_all_levels(),
     {reply, Reply, State};
 
 handle_call({read_level,Level},_From, State) ->
