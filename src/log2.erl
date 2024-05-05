@@ -170,7 +170,7 @@ handle_call({read_all_levels},_From, State) ->
     Reply = lib_db_log2:read_all_levels(),
     {reply, Reply, State};
 
-handle_call({read_all_latests,Num},_From, State) ->
+handle_call({read_all_latest,Num},_From, State) ->
     Reply = lib_db_log2:read_all_latest(Num),
     {reply, Reply, State};
 
